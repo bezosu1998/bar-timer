@@ -1,0 +1,355 @@
+:root {
+  --desk: #dfe3e7;
+  --body: #f7f8f9;
+  --body-edge: #cfd3d7;
+  --key: #f0f1f3;
+  --key-text: #3b4046;
+  --lcd-bg: #c4cbc8;
+  --lcd-bg-dark: #b3bbb8;
+  --seg-on: #262a2e;
+  --seg-off: rgba(30, 34, 38, 0.07);
+  --accent: #2d5f7a;
+  --bar-red: #ee3b2f;
+  --bar-orange: #f5a21b;
+  --bar-green: #35c23f;
+  --bar-blue: #2f7cf0;
+  font-family: "Yu Gothic UI", "Meiryo", "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--desk);
+  color: var(--key-text);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation; /* ダブルタップ拡大を抑止（液晶ダブルタップでコンパクト切替） */
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.device {
+  position: relative;
+  width: 688px;
+  height: 240px;
+  padding: 10px 16px 8px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fbfbfc 0%, var(--body) 60%, #eceef0 100%);
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 0 0 1px var(--body-edge),
+    0 10px 24px rgba(0, 0, 0, 0.18),
+    0 2px 4px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---------- 上面ボタン列 ---------- */
+.top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  height: 58px;
+}
+
+.key-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.key-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.key {
+  min-width: 64px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #c8ccd1;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffffff, var(--key));
+  color: var(--key-text);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  box-shadow: 0 1px 0 #fff inset, 0 1px 2px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: transform 0.05s, box-shadow 0.05s;
+}
+
+@media (hover: hover) {
+  .key:hover { background: linear-gradient(180deg, #ffffff, #e9ebee); }
+}
+.key:active, .key.pressed {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) inset;
+  background: #e3e6ea;
+}
+
+.key-sub {
+  min-width: 64px;
+  height: 20px;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 0 8px;
+}
+
+.key-mode { min-width: 72px; }
+
+.key-start {
+  min-width: 128px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+.key-start .small { font-size: 10px; font-weight: 500; }
+
+/* ---------- 液晶 ---------- */
+.lcd-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  height: 118px;
+}
+
+.lcd {
+  background: linear-gradient(180deg, var(--lcd-bg) 0%, var(--lcd-bg-dark) 100%);
+  border-radius: 6px;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35) inset,
+    0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid #a4aca9;
+}
+
+.bar-lcd {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 5px;
+  padding: 12px 12px;
+}
+
+.bar-lcd .seg {
+  background: var(--seg-off);
+  border-radius: 2px;
+  transition: background 0.12s;
+}
+/* VBT20 プラスと同じ 4 色目盛り: 左から 赤・橙・緑・青 各 5 本。
+   目盛りは右端から消えていくので、最後に残るのが赤。 */
+.bar-lcd .seg.on { background: var(--seg-on); box-shadow: 0 0 6px rgba(0, 0, 0, 0.15) inset; }
+.bar-lcd .seg:nth-child(-n+5).on  { background: var(--bar-red); }
+.bar-lcd .seg:nth-child(n+6):nth-child(-n+10).on  { background: var(--bar-orange); }
+.bar-lcd .seg:nth-child(n+11):nth-child(-n+15).on { background: var(--bar-green); }
+.bar-lcd .seg:nth-child(n+16).on { background: var(--bar-blue); }
+.bar-lcd.blink-off .seg.on { background: var(--seg-off); box-shadow: none; }
+
+.digit-lcd {
+  width: 268px;
+  padding: 6px 8px;
+  color: var(--seg-on);
+  display: flex;
+  align-items: center;
+}
+.digit-lcd svg { width: 100%; height: 100%; }
+
+.ico { opacity: 0.08; }
+.ico.on { opacity: 1; }
+
+.unit {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  fill: currentColor;
+}
+
+svg .segm { fill: var(--seg-off); }
+svg .segm.on { fill: var(--seg-on); }
+svg .rep { opacity: 0.08; }
+svg .rep.on { opacity: 1; }
+svg .hidden { visibility: hidden; }
+
+/* ---------- 右側面スイッチ ---------- */
+.mute-switch {
+  width: 34px;
+  border-radius: 8px;
+  border: 1px solid #c8ccd1;
+  background: linear-gradient(180deg, #f3f4f6, #e2e5e9);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18) inset;
+}
+.mute-switch .knob {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  height: 46%;
+  top: 4px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #ffffff, #d6d9dd);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  transition: top 0.15s;
+}
+.mute-switch[aria-pressed="true"] .knob { top: calc(54% - 4px); }
+.mute-switch .lbl {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 9px;
+  color: #6b7178;
+  pointer-events: none;
+}
+.mute-switch .lbl-on { top: 10px; }
+.mute-switch .lbl-off { bottom: 10px; }
+.mute-switch[aria-pressed="true"] .lbl-off,
+.mute-switch[aria-pressed="false"] .lbl-on { color: var(--accent); font-weight: 700; }
+
+/* ---------- コンパクト表示（ボタン類を隠して液晶だけ） ---------- */
+.compact-toggle {
+  /* 通常表示では右下（ヒント文字の上）、コンパクト表示では右上に出す */
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  z-index: 2;
+  height: 16px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  background: rgba(45, 95, 122, 0.85);
+  color: #fff;
+  font-size: 9px;
+  line-height: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+@media (hover: hover) { .device:hover .compact-toggle { opacity: 1; } }
+@media (hover: none) { .compact-toggle { opacity: 1; } }
+.compact-toggle .when-compact { display: none; }
+
+.device.compact {
+  height: 138px;
+  padding: 10px 16px;
+}
+.device.compact .top-row,
+.device.compact .bottom-row,
+.device.compact .mute-switch { display: none; }
+.device.compact .compact-toggle { top: 0; bottom: auto; right: 10px; border-radius: 0 0 6px 6px; }
+.device.compact .compact-toggle .when-full { display: none; }
+.device.compact .compact-toggle .when-compact { display: inline; }
+
+/* ---------- 下段（デスクトップ補助） ---------- */
+.bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  font-size: 11px;
+  color: #6b7178;
+}
+
+.aux {
+  flex-shrink: 0;
+  white-space: nowrap;
+  height: 22px;
+  padding: 0 10px;
+  border: 1px solid #c8ccd1;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #ffffff, var(--key));
+  color: var(--key-text);
+  font-size: 11px;
+  cursor: pointer;
+}
+.aux:active { background: #e3e6ea; }
+.aux[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.status {
+  flex-shrink: 0;
+  min-width: 150px;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.hint {
+  margin-left: auto;
+  min-width: 0;
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+}
+
+/* ---------- スマホ / ブラウザ(PWA)向け ---------- */
+.mobile-only { display: none; }
+html.web .desktop-only { display: none; }   /* 「常に手前」はブラウザでは効かない */
+html.web .hint { display: none; }
+
+/* 横向き・画面が狭いときは本体を縮小して収める（--fit は JS が計算） */
+.device {
+  transform: scale(var(--fit, 1));
+  transform-origin: center center;
+}
+
+/* 縦向きスマホ: 本体を縦積みレイアウトに組み替える */
+@media (max-width: 640px) and (orientation: portrait) {
+  html, body { height: auto; min-height: 100%; overflow: auto; }
+  body {
+    align-items: flex-start;
+    padding: calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom));
+  }
+  .device {
+    width: 100%;
+    height: auto;
+    padding: 12px;
+    gap: 12px;
+    transform: none;
+  }
+  .top-row { height: auto; flex-wrap: wrap; gap: 8px; }
+  .key-mode { flex: 0 0 100%; height: 40px; font-size: 15px; }
+  .key-group { flex: 1 1 100%; gap: 8px; }
+  .key-group > .key, .key-col { flex: 1 1 0; min-width: 0; }
+  .key { height: 40px; font-size: 15px; padding: 0 4px; }
+  .key-col { gap: 6px; }
+  .key-sub { width: 100%; min-width: 0; height: 26px; font-size: 12px; }
+  .key-start { flex: 0 0 100%; height: 56px; font-size: 16px; }
+  .key-start .small { font-size: 12px; }
+
+  .lcd-row { flex-direction: column; height: auto; gap: 10px; }
+  .bar-lcd { flex: none; height: 64px; padding: 10px; gap: 4px; }
+  .digit-lcd { width: 100%; padding: 8px 10px; }
+  .digit-lcd svg { height: auto; }
+  .mute-switch { display: none; }
+  .mobile-only { display: inline-block; }
+
+  .bottom-row { height: auto; flex-wrap: wrap; gap: 8px; }
+  .aux { height: 36px; padding: 0 14px; font-size: 14px; }
+  .status { flex-basis: 100%; min-width: 0; font-size: 14px; }
+  .hint { display: none; }
+
+  .device.compact { height: auto; padding: 12px; }
+  .device.compact .compact-toggle { top: 0; }
+  .compact-toggle { height: 22px; line-height: 22px; font-size: 12px; padding: 0 10px; }
+}

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>Visual Bar Timer</title>
+  <meta name="theme-color" content="#dfe3e7" />
+  <!-- PWA（iPhone / Android のホーム画面に追加して使う） -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="BarTimer" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="device" id="device">
+    <!-- ボタン類の表示/非表示（液晶だけのコンパクト表示）。ホバーで現れる -->
+    <button class="compact-toggle" id="compactBtn" title="ボタン類を隠す/表示 [H]（液晶ダブルクリックでも切替）" aria-pressed="false">
+      <span class="when-full">▲ ボタンを隠す</span><span class="when-compact">▼ ボタンを表示</span>
+    </button>
+
+    <!-- 本体上面のボタン列（実機: モード / 10分 / 1分 / 10秒 / スタート・ストップ 決定） -->
+    <div class="top-row">
+      <button class="key key-mode" data-key="mode" title="モード切替 [M]">モード</button>
+      <div class="key-group">
+        <button class="key" data-key="m10" title="+10分 [1]">10分</button>
+        <div class="key-col">
+          <button class="key" data-key="m1" title="+1分 [2]">1分</button>
+          <button class="key key-sub" data-key="rep" title="リピート数 [N]">リピート数</button>
+        </div>
+        <button class="key" data-key="s10" title="+10秒 [3]">10秒</button>
+      </div>
+      <button class="key key-start" data-key="start" title="スタート/ストップ・決定 [Space]">
+        <span>スタート／ストップ</span><span class="small">決定</span>
+      </button>
+    </div>
+
+    <!-- 液晶部 -->
+    <div class="lcd-row">
+      <div class="lcd bar-lcd" id="bar" aria-label="目盛り"></div>
+
+      <div class="lcd digit-lcd">
+        <svg id="lcdSvg" viewBox="0 0 268 112" xmlns="http://www.w3.org/2000/svg">
+          <!-- 上段アイコン: 時計(リピートモード) / 矢印(↓カウントダウン ↑カウントアップ) / コップ(休憩) / 消音 -->
+          <g id="icoClock" class="ico" transform="translate(10,8)">
+            <circle cx="9" cy="9" r="8" fill="none" stroke="currentColor" stroke-width="2.2"/>
+            <path d="M9 4.5V9.5L12.5 11.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </g>
+          <g id="icoDown" class="ico" transform="translate(38,7)">
+            <path d="M8 1v14M3 10l5 6 5-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g id="icoUp" class="ico" transform="translate(58,7)">
+            <path d="M8 17V3M3 8l5-6 5 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g id="icoCup" class="ico" transform="translate(84,7)">
+            <path d="M2 3h13v8a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5z" fill="currentColor"/>
+            <path d="M15 5h3a2.5 2.5 0 0 1 0 5h-3" fill="none" stroke="currentColor" stroke-width="2"/>
+          </g>
+          <g id="icoMute" class="ico" transform="translate(236,6)">
+            <path d="M2 7h4l6-5v16l-6-5H2z" fill="currentColor"/>
+            <path d="M15 6l7 8M22 6l-7 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          </g>
+
+          <!-- リピート数（小さい2桁、左下） -->
+          <g id="repDigits" class="rep" transform="translate(8,80) scale(0.4)"></g>
+
+          <!-- 本体表示 MM / SS -->
+          <g id="bigDigits" transform="translate(44,26)"></g>
+          <text class="unit" x="139" y="92">M</text>
+          <text class="unit" x="257" y="92">S</text>
+        </svg>
+      </div>
+
+      <!-- 本体右側面の消音切替スイッチ -->
+      <button class="mute-switch" id="muteSwitch" title="消音切替 [S]" aria-pressed="false">
+        <span class="knob"></span>
+        <span class="lbl lbl-on">音</span>
+        <span class="lbl lbl-off">消音</span>
+      </button>
+    </div>
+
+    <!-- デスクトップ版の補助操作 -->
+    <div class="bottom-row">
+      <button class="aux" data-key="reset" title="リセット（実機は 1分+10秒 同時押し） [R]">リセット</button>
+      <button class="aux desktop-only" id="topBtn" title="ウィンドウを常に手前に表示 [T]" aria-pressed="false">常に手前</button>
+      <!-- スマホ縦向きでは右側面スイッチの代わりにこのボタンで消音切替 -->
+      <button class="aux mobile-only" id="muteBtn" title="消音切替" aria-pressed="false">消音</button>
+      <span class="status" id="status"></span>
+      <span class="hint">Space:開始/停止 1/2/3:+10分/+1分/+10秒 M:モード N:リピート数 R:リセット S:消音 H:ボタン隠す</span>
+    </div>
+  </main>
+  <script src="main.js"></script>
+</body>
+</html>

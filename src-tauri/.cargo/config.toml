@@ -1,0 +1,11 @@
+# GNU ターゲットで LLD リンカを使う設定（purchase-bot GUI と同じ）。
+# 既定の binutils ld は Tauri 規模のシンボル数で "export ordinal too large" になるため。
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+rustflags = [
+    "-C", "link-arg=-fuse-ld=lld",
+    "-C", "link-arg=-Bc:/users/yone/.rustup/toolchains/stable-x86_64-pc-windows-gnu/lib/rustlib/x86_64-pc-windows-gnu/bin/gcc-ld"
+]
+
+[build]
+target-dir = "C:/rust-builds/visual-bar-timer"

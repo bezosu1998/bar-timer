@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "メインウィンドウ: 常に手前表示の切替に必要な権限",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-title",
+    "core:window:allow-set-size",
+    "core:window:allow-is-minimized",
+    "core:window:allow-unminimize"
+  ]
+}

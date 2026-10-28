@@ -1,0 +1,14 @@
+{
+  "name": "visual-bar-timer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KING JIM ビジュアルバータイマー VBT10 風デスクトップタイマー (Tauri 2)",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build --no-bundle",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.2"
+  }
+}

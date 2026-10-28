@@ -1,0 +1,24 @@
+[package]
+name = "visual-bar-timer"
+version = "1.0.0"
+description = "KING JIM ビジュアルバータイマー VBT10 風デスクトップタイマー"
+authors = ["yone"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "app_lib"
+# デスクトップ専用。cdylib を外して PE の export symbol 上限問題を回避（purchase-bot GUI と同じ）。
+crate-type = ["staticlib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "2", features = [] }
+
+[profile.release]
+opt-level = "s"
+strip = true
