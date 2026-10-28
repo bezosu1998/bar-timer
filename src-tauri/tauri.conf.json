@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Visual Bar Timer",
+  "productName": "Bar Timer",
   "version": "1.0.0",
   "identifier": "local.yone.visual-bar-timer",
   "build": {
@@ -11,7 +11,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Visual Bar Timer",
+        "title": "Bar Timer",
         "width": 720,
         "height": 272,
         "resizable": false,

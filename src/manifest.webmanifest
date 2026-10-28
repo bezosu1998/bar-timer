@@ -1,7 +1,7 @@
 {
-  "name": "Visual Bar Timer",
+  "name": "Bar Timer",
   "short_name": "BarTimer",
-  "description": "KING JIM ビジュアルバータイマー VBT10 の機能を再現したタイマー",
+  "description": "バー型の目盛りで残り時間がひと目で分かるタイマー",
   "lang": "ja",
   "start_url": "./",
   "scope": "./",

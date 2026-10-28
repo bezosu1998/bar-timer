@@ -517,8 +517,8 @@ let lastTitle = '';
 function updateTitle(mm, ss, status) {
   const running = R.phase === 'running';
   const title = running
-    ? `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')} - Visual Bar Timer`
-    : 'Visual Bar Timer';
+    ? `${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')} - Bar Timer`
+    : 'Bar Timer';
   if (title === lastTitle) return;
   lastTitle = title;
   document.title = title;
