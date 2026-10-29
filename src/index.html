@@ -18,7 +18,7 @@
 <body>
   <main class="device" id="device">
     <!-- ボタン類の表示/非表示（液晶だけのコンパクト表示）。ホバーで現れる -->
-    <button class="compact-toggle" id="compactBtn" title="ボタン類を隠す/表示 [H]（液晶ダブルクリックでも切替）" aria-pressed="false">
+    <button class="compact-toggle" id="compactBtn" title="ボタン類を隠す/表示 [H]（目盛り液晶ダブルクリックでも切替）" aria-pressed="false">
       <span class="when-full">▲ ボタンを隠す</span><span class="when-compact">▼ ボタンを表示</span>
     </button>
 
@@ -42,7 +42,7 @@
     <div class="lcd-row">
       <div class="lcd bar-lcd" id="bar" aria-label="目盛り"></div>
 
-      <div class="lcd digit-lcd">
+      <div class="lcd digit-lcd" id="digitLcd" title="タップでスタート/ストップ・決定" role="button">
         <svg id="lcdSvg" viewBox="0 0 268 112" xmlns="http://www.w3.org/2000/svg">
           <!-- 上段アイコン: 時計(リピートモード) / 矢印(↓カウントダウン ↑カウントアップ) / コップ(休憩) / 消音 -->
           <g id="icoClock" class="ico" transform="translate(10,8)">

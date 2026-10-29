@@ -540,7 +540,8 @@ function toggleAlwaysOnTop() {
 
 // ---------------------------------------------------------------- コンパクト表示
 // ボタン類（上面ボタン・下段・右側面スイッチ）を隠し、ウィンドウも液晶の高さに縮める。
-// 操作はキーボード / ホバーで出る小ボタン / 液晶ダブルクリックで続けられる。
+// 操作はキーボード / ホバーで出る小ボタン / 目盛り液晶ダブルクリックで続けられる。
+// （数字液晶はタップでスタート/ストップなので、ダブルクリック切替は目盛り側だけ）
 const WIN_W = 720;
 const WIN_H_FULL = 272;
 const WIN_H_COMPACT = 158;
@@ -618,7 +619,9 @@ window.addEventListener('pointerdown', unlockAudio);
 window.addEventListener('keydown', unlockAudio);
 el.top.addEventListener('click', toggleAlwaysOnTop);
 compactBtn.addEventListener('click', toggleCompact);
-document.querySelectorAll('.lcd').forEach((lcd) => lcd.addEventListener('dblclick', toggleCompact));
+document.getElementById('bar').addEventListener('dblclick', toggleCompact);
+// 数字液晶のタップ = スタート/ストップ・決定（スマホでボタンを隠したまま操作できるように）
+document.getElementById('digitLcd').addEventListener('click', () => { flashKey('start'); runAction('start'); });
 
 const KEYMAP = {
   ' ': 'start', 'Enter': 'start',
