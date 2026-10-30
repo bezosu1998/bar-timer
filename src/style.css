@@ -306,6 +306,8 @@ svg .hidden { visibility: hidden; }
 
 /* ---------- スマホ / ブラウザ(PWA)向け ---------- */
 .mobile-only { display: none; }
+.ver { font-size: 10px; opacity: 0.5; margin-left: auto; }
+.ver:empty { display: none; }
 html.web .desktop-only { display: none; }   /* 「常に手前」はブラウザでは効かない */
 html.web .hint { display: none; }
 
@@ -348,7 +350,8 @@ html.web .hint { display: none; }
 
   .bottom-row { height: auto; flex-wrap: wrap; gap: 8px; }
   .aux { height: 36px; padding: 0 14px; font-size: 14px; }
-  .status { flex-basis: 100%; min-width: 0; font-size: 14px; }
+  .status { flex-basis: 100%; min-width: 0; font-size: 14px; order: 2; }
+  .ver { order: 1; }
   .hint { display: none; }
 
   .device.compact { height: auto; padding: 12px; }

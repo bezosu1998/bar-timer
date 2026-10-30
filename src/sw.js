@@ -1,7 +1,7 @@
 // オフライン動作用 Service Worker。
-// アプリ本体をキャッシュしつつ、裏でネットワークから更新を取りに行く（stale-while-revalidate）。
-// 更新は次回起動時に反映される。
-const CACHE = 'vbt10-v1';
+// 通常はネットワークから最新を取得してキャッシュを更新し（network-first）、
+// 圏外・読み込みが遅いときだけキャッシュから出す。古い版が残り続けないようにするため。
+const CACHE = 'bartimer-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -13,9 +13,14 @@ const ASSETS = [
   './icons/icon-512-maskable.png',
   './icons/apple-touch-icon.png',
 ];
+const NETWORK_TIMEOUT_MS = 4000;
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE)
+      .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener('activate', (e) => {
@@ -28,13 +33,18 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== self.location.origin) return;
-  e.respondWith(
-    caches.open(CACHE).then(async (cache) => {
-      const cached = await cache.match(e.request, { ignoreSearch: true });
-      const fresh = fetch(e.request)
-        .then((res) => { if (res.ok) cache.put(e.request, res.clone()); return res; })
-        .catch(() => null);
-      return cached || (await fresh) || Response.error();
-    }),
-  );
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), NETWORK_TIMEOUT_MS);
+    try {
+      const res = await fetch(e.request, { cache: 'no-cache', signal: ctrl.signal });
+      if (res.ok) cache.put(e.request, res.clone());
+      return res;
+    } catch {
+      return (await cache.match(e.request, { ignoreSearch: true })) || Response.error();
+    } finally {
+      clearTimeout(timer);
+    }
+  })());
 });

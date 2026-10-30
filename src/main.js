@@ -29,19 +29,22 @@ const defaults = {
   m2: { work: 0, rest: 0, count: 1 },
 };
 
+// structuredClone は iOS 15.4 未満に無いので JSON で複製する
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
 function loadSettings() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (!raw) return structuredClone(defaults);
+    if (!raw) return clone(defaults);
     const s = JSON.parse(raw);
     return {
-      ...structuredClone(defaults),
+      ...clone(defaults),
       ...s,
       m1: { ...defaults.m1, ...(s.m1 || {}) },
       m2: { ...defaults.m2, ...(s.m2 || {}) },
     };
   } catch {
-    return structuredClone(defaults);
+    return clone(defaults);
   }
 }
 
@@ -680,8 +683,9 @@ if (!IS_TAURI) document.documentElement.classList.add('web');
 // iPhone の Web アプリはバックグラウンドで音を鳴らせないので、これが実質のアラーム保証になる。
 let wakeLock = null;
 let wakeLockBusy = false;
+let wakeLockRetryAt = 0;   // 取得に失敗したら 10 秒空ける（render 毎に再試行しない）
 async function syncWakeLock() {
-  if (IS_TAURI || !('wakeLock' in navigator) || wakeLockBusy) return;
+  if (IS_TAURI || !('wakeLock' in navigator) || wakeLockBusy || Date.now() < wakeLockRetryAt) return;
   const want = (R.phase === 'running' || R.phase === 'alarm') && document.visibilityState === 'visible';
   if (want === Boolean(wakeLock)) return;
   wakeLockBusy = true;
@@ -693,7 +697,7 @@ async function syncWakeLock() {
       await wakeLock.release();
       wakeLock = null;
     }
-  } catch { wakeLock = null; } finally { wakeLockBusy = false; }
+  } catch { wakeLock = null; wakeLockRetryAt = Date.now() + 10000; } finally { wakeLockBusy = false; }
 }
 document.addEventListener('visibilitychange', () => {
   // 戻ってきたら即座に時刻を進める（バックグラウンドでは tick が止まるため）
@@ -715,9 +719,26 @@ function fitDevice() {
 window.addEventListener('resize', fitDevice);
 window.addEventListener('orientationchange', () => setTimeout(fitDevice, 50));
 
+// 画面に出ている版が分かるように（スマホで古い版が残っていないか確認用）
+const APP_VERSION = '1.2';
+const verEl = document.getElementById('appVer');
+if (verEl && !IS_TAURI) verEl.textContent = 'v' + APP_VERSION;
+
 if (!IS_TAURI && 'serviceWorker' in navigator) {
+  // 新しい Service Worker に切り替わったら、待機中（計測していない）のときにリロードして最新版にする
+  const hadController = Boolean(navigator.serviceWorker.controller);
+  let reloadPending = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) reloadPending = true; });
+  setInterval(() => {
+    if (reloadPending && (R.phase === 'idle' || R.phase === 'setWork')) location.reload();
+  }, 1000);
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => { /* file:// 等では登録できない */ });
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      // ホーム画面アプリは再読み込みされないので、前面に戻るたびに更新を確認する
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') reg.update().catch(() => {});
+      });
+    }).catch(() => { /* file:// 等では登録できない */ });
   });
 }
 
